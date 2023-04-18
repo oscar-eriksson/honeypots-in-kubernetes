@@ -1,0 +1,51 @@
+# Create HPC namespace
+apiVersion: hnc.x-k8s.io/v1alpha2
+kind: SubnamespaceAnchor
+metadata:
+  name: cowrie
+  namespace: production
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cowrie
+  name: cowrie
+  namespace: cowrie
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cowrie
+  template:
+    metadata:
+      labels:
+        app: cowrie
+    spec:
+      securityContext:
+        runAsUser: 999
+      containers:
+      - name: cowrie
+        image: cowrie/cowrie
+        ports:
+        - containerPort: 2222
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cowrie
+  name: cowrie
+  namespace: cowrie
+spec:
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: PreferDualStack
+  ports:
+  - port: 2222
+    protocol: TCP
+    targetPort: 2222
+  selector:
+    app: cowrie
+  type: NodePort
