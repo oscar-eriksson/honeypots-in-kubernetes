@@ -49,3 +49,17 @@ spec:
   selector:
     app: cowrie
   type: NodePort
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: cowrie
+  labels:
+    app: cowrie
+  namespace: cowrie
+spec:
+  selector:
+    matchLabels:
+      app: cowrie
+  podMetricsEndpoints:
+  - port: web
